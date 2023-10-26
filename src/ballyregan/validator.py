@@ -113,7 +113,7 @@ class ProxyValidator:
 
         return list(valid_proxies.queue)
     
-    def filter_valid_proxies(self, proxies: List[Proxy], limit: int = 0) -> List[Proxy]:
+    async def filter_valid_proxies(self, proxies: List[Proxy], limit: int = 0) -> List[Proxy]:
         """Gets a list of proxies, filters them and returns only the valid ones.
         wrapper for the async one
 
@@ -126,6 +126,4 @@ class ProxyValidator:
             List[Proxy]: The filter list contains only valid proxies
         """
         
-        return self.loop.run_until_complete(
-            self._async_filter_valid_proxies(proxies, limit)
-        )
+        return await self._async_filter_valid_proxies(proxies, limit)

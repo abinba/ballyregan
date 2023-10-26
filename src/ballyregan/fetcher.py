@@ -64,7 +64,7 @@ class ProxyFetcher:
 
         return ProxyValidator(loop=self.loop)
 
-    def _get_all_proxies_from_providers(self) -> list:
+    async def _get_all_proxies_from_providers(self) -> list:
         """Iterates through all the providers, gather proxies and returns them.
         """
         logger.debug('Gathering all proxies from providers')
@@ -76,7 +76,7 @@ class ProxyFetcher:
         logger.debug('Finished gathering all proxies from providers')
         return list(set(chain.from_iterable(proxies_generator)))
 
-    def _gather(
+    async def _gather(
         self,
         protocols: Optional[List[Protocols]] = None,
         anonymities: Optional[List[Anonymities]] = None,
@@ -96,13 +96,13 @@ class ProxyFetcher:
             protocols = []
 
         logger.debug(f'Proxies gather started.')
-        proxies = self._get_all_proxies_from_providers()
+        proxies = await self._get_all_proxies_from_providers()
         filtered_proxies = self._proxy_filterer.filter(
             proxies,
             protocols=protocols,
             anonymities=anonymities,
         )
-        valid_proxies = self._proxy_validator.filter_valid_proxies(
+        valid_proxies = await self._proxy_validator.filter_valid_proxies(
             proxies=filtered_proxies,
             limit=limit,
         )
@@ -115,7 +115,7 @@ class ProxyFetcher:
 
         return valid_proxies
 
-    def get_one(
+    async def get_one(
         self,
         protocols: Optional[List[Protocols]] = None,
         anonymities: Optional[List[Anonymities]] = None,
@@ -135,13 +135,14 @@ class ProxyFetcher:
         if anonymities is None:
             anonymities = []
 
-        return self._gather(
+        proxies = await self._gather(
             protocols=protocols,
             anonymities=anonymities,
             limit=1
-        )[0]
+        )
+        return proxies[0]
 
-    def get(
+    async def get(
         self,
         protocols: List[Protocols] = None,
         anonymities: List[Anonymities] = None,
@@ -164,7 +165,7 @@ class ProxyFetcher:
         if anonymities is None:
             anonymities = []
 
-        proxies = self._gather(
+        proxies = await self._gather(
             protocols=protocols,
             anonymities=anonymities,
             limit=limit

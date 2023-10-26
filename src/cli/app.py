@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 import typer
@@ -12,6 +13,29 @@ from ballyregan.models import Protocols, Anonymities
 app = typer.Typer()
 
 fetcher = ProxyFetcher()
+
+
+async def get_proxies(
+    protocols: List[Protocols],
+    anonymities: List[Anonymities],
+    limit: int,
+    all: bool,
+    output_format: OutputFormats
+):
+    if all:
+        limit = 0
+    try:
+        proxies = await fetcher.get(
+            protocols=protocols,
+            anonymities=anonymities,
+            limit=limit
+        )
+    except ProxyException as e:
+        typer.echo(message=e, err=True)
+    except Exception as e:
+        typer.echo(message=f'UNKNOWN ERROR - {e}', err=True)
+    else:
+        print_proxies(proxies, output_format=output_format)
 
 
 @app.command(help="Get Proxies.")
@@ -43,20 +67,15 @@ def get(
         help='Output format of proxies.'
     )
 ) -> None:
-    if all:
-        limit = 0
-    try:
-        proxies = fetcher.get(
+    asyncio.run(
+        get_proxies(
             protocols=protocols,
             anonymities=anonymities,
-            limit=limit
+            limit=limit,
+            all=all,
+            output_format=output_format,
         )
-    except ProxyException as e:
-        typer.echo(message=e, err=True)
-    except Exception as e:
-        typer.echo(message=f'UNKNOWN ERROR - {e}', err=True)
-    else:
-        print_proxies(proxies, output_format=output_format)
+    )
 
 
 @app.callback()
