@@ -31,7 +31,8 @@ class IProxyProvider(ABC):
         """
         pass
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def raw_proxy_to_object(raw_proxy: Any) -> Proxy:
         """Gets a proxy and converts it to Proxy class object
 

@@ -17,7 +17,7 @@ def proxies_to_table(proxies: List[Proxy]) -> ColorTable:
         hrules=ALL
     )
     proxies_table.add_rows([
-        [str(proxy), *proxy.dict().values()]
+        [str(proxy), *proxy.model_dump().values()]
         for proxy in proxies
     ])
     return proxies_table
